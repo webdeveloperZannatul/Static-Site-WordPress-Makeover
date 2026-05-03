@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Static Site → WordPress Makeover</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --red: #c0392b;
+    --red-dark: #a93226;
+    --dark: #111111;
+    --dark2: #1a1a1a;
+    --dark3: #222222;
+    --gray: #555;
+    --light-gray: #f5f5f5;
+    --white: #ffffff;
+    --gold: #e8a020;
+    --font-main: 'Roboto', sans-serif;
+    --font-heading: 'Oswald', sans-serif;
+    --font-condensed: 'Barlow Condensed', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-main); color: var(--dark); overflow-x: hidden; }
+  a { text-decoration: none; color: inherit; }
+  img { max-width: 100%; display: block; }
+  ul { list-style: none; }
+
+  /* ===== NAVBAR ===== */
+  .navbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: rgba(10,10,10,0.97);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 64px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; }
+  .nav-logo-icon {
+    width: 40px; height: 40px; background: var(--red); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: white; font-weight: 700;
+  }
+  .nav-logo-text { color: white; }
+  .nav-logo-text .brand { font-family: var(--font-heading); font-size: 18px; font-weight: 700; letter-spacing: 1px; display: block; line-height: 1; }
+  .nav-logo-text .sub { font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,0.5); text-transform: uppercase; }
+  .nav-menu { display: flex; align-items: center; gap: 30px; }
+  .nav-menu a { color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; transition: color 0.2s; padding: 4px 0; border-bottom: 2px solid transparent; }
+  .nav-menu a:hover, .nav-menu a.active { color: var(--red); border-bottom-color: var(--red); }
+  .nav-right { display: flex; align-items: center; gap: 14px; }
+  .nav-search, .nav-icon { color: rgba(255,255,255,0.7); font-size: 14px; cursor: pointer; transition: color 0.2s; }
+  .nav-search:hover, .nav-icon:hover { color: var(--red); }
+  .nav-ticket-btn {
+    background: var(--red); color: white; padding: 8px 18px;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; border: none; cursor: pointer; transition: background 0.2s;
+  }
+  .nav-ticket-btn:hover { background: var(--red-dark); }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+  .hamburger span { width: 24px; height: 2px; background: white; display: block; transition: all 0.3s; }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 100vh; position: relative; overflow: hidden;
+    display: flex; align-items: flex-end; padding-bottom: 100px;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0505 50%, #0a0a0a 100%);
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: url('https://images.unsplash.com/photo-1529768167801-9173d94c2a42?w=1600&q=80') center/cover no-repeat;
+    opacity: 0.45;
+  }
+  .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to right, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.2) 100%); }
+  .hero-content { position: relative; z-index: 2; padding: 0 80px; max-width: 700px; }
+  .hero-badge {
+    display: inline-block; background: var(--red); color: white;
+    font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    padding: 5px 14px; margin-bottom: 20px;
+  }
+  .hero-title {
+    font-family: var(--font-heading); font-size: clamp(48px, 7vw, 88px);
+    font-weight: 700; color: white; line-height: 1.05;
+    text-transform: uppercase; letter-spacing: -1px; margin-bottom: 16px;
+  }
+  .hero-subtitle { color: rgba(255,255,255,0.7); font-size: 15px; margin-bottom: 36px; line-height: 1.6; max-width: 420px; }
+  .hero-buttons { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--red); color: white; padding: 14px 32px;
+    font-family: var(--font-heading); font-size: 13px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase; border: none; cursor: pointer;
+    transition: background 0.2s; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { background: var(--red-dark); }
+  .btn-outline {
+    background: transparent; color: white; padding: 14px 32px;
+    font-family: var(--font-heading); font-size: 13px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase;
+    border: 2px solid rgba(255,255,255,0.6); cursor: pointer;
+    transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-outline:hover { border-color: white; background: rgba(255,255,255,0.1); }
+  .hero-scroll-line {
+    position: absolute; bottom: 40px; left: 80px; z-index: 2;
+    display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.4); font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  }
+  .hero-scroll-line::before { content: ''; width: 40px; height: 1px; background: var(--red); }
+
+  /* ===== SECTION TITLES ===== */
+  .section-title {
+    font-family: var(--font-heading); font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    text-align: center; margin-bottom: 8px; color: var(--dark);
+  }
+  .section-subtitle { text-align: center; color: var(--gray); font-size: 14px; margin-bottom: 48px; line-height: 1.6; max-width: 540px; margin-left: auto; margin-right: auto; }
+
+  /* ===== UPCOMING GAMES ===== */
+  .upcoming-games { background: white; padding: 80px 40px; }
+  .games-slider { position: relative; }
+  .games-track { display: flex; gap: 20px; justify-content: center; align-items: stretch; flex-wrap: wrap; }
+  .game-card {
+    background: white; border: 1px solid #e8e8e8; padding: 24px 28px;
+    min-width: 260px; flex: 1; max-width: 320px; text-align: center;
+    transition: box-shadow 0.3s; cursor: pointer;
+  }
+  .game-card:hover { box-shadow: 0 8px 40px rgba(0,0,0,0.1); }
+  .game-card.featured { background: var(--red); color: white; border-color: var(--red); box-shadow: 0 12px 50px rgba(192,57,43,0.35); }
+  .game-date { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; color: var(--red); }
+  .game-card.featured .game-date { color: rgba(255,255,255,0.8); }
+  .game-time { font-family: var(--font-heading); font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+  .game-teams { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 12px; }
+  .team-logo-box {
+    width: 50px; height: 50px; border-radius: 50%; background: #f0f0f0;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .game-card.featured .team-logo-box { background: rgba(255,255,255,0.2); }
+  .vs-text { font-family: var(--font-heading); font-size: 13px; font-weight: 700; letter-spacing: 2px; color: var(--gray); }
+  .game-card.featured .vs-text { color: rgba(255,255,255,0.7); }
+  .game-vs-label { font-family: var(--font-heading); font-size: 14px; font-weight: 700; letter-spacing: 1px; }
+  .game-card.featured .game-vs-label { color: rgba(255,255,255,0.9); }
+  .slider-dots { display: flex; justify-content: center; gap: 8px; margin-top: 36px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #ddd; cursor: pointer; transition: background 0.2s; }
+  .dot.active { background: var(--red); }
+  .slider-arrows { display: flex; justify-content: space-between; position: absolute; top: 50%; transform: translateY(-50%); width: 100%; pointer-events: none; }
+  .arrow-btn {
+    pointer-events: all; width: 42px; height: 42px; background: white;
+    border: 1px solid #ddd; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s; font-size: 14px; color: var(--dark);
+  }
+  .arrow-btn:hover { background: var(--red); color: white; border-color: var(--red); }
+
+  /* ===== NEWS & MEDIA ===== */
+  .news-section { background: var(--light-gray); padding: 80px 40px; }
+  .news-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; max-width: 1200px; margin: 0 auto; }
+  .news-main { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .news-card { background: white; overflow: hidden; cursor: pointer; transition: box-shadow 0.3s; }
+  .news-card:hover { box-shadow: 0 8px 40px rgba(0,0,0,0.12); }
+  .news-img { width: 100%; height: 180px; object-fit: cover; display: block; }
+  .news-img-placeholder {
+    width: 100%; height: 180px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px; color: rgba(255,255,255,0.3);
+  }
+  .news-body { padding: 16px 18px; }
+  .news-tag { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--red); margin-bottom: 8px; display: block; }
+  .news-title-text { font-family: var(--font-heading); font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.3; margin-bottom: 8px; }
+  .news-read { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--red); display: flex; align-items: center; gap: 6px; }
+  .news-sidebar { display: flex; flex-direction: column; gap: 0; }
+  .news-side-item { background: white; padding: 16px 18px; border-bottom: 1px solid #f0f0f0; cursor: pointer; display: flex; gap: 14px; align-items: flex-start; transition: background 0.2s; }
+  .news-side-item:hover { background: #fafafa; }
+  .news-side-img {
+    width: 70px; height: 65px; flex-shrink: 0; object-fit: cover;
+    background: linear-gradient(135deg, #c0392b, #922b21);
+    display: flex; align-items: center; justify-content: center; font-size: 18px; color: white;
+  }
+  .news-side-body { flex: 1; }
+  .news-side-date { font-size: 10px; color: var(--gray); margin-bottom: 5px; }
+  .news-side-title { font-family: var(--font-heading); font-size: 13px; font-weight: 700; text-transform: uppercase; line-height: 1.3; margin-bottom: 6px; }
+  .news-side-read { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--red); }
+
+  /* ===== PRIMARY LEAGUE STANDING ===== */
+  .standing-section {
+    background: url('https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=1600&q=80') center/cover no-repeat;
+    position: relative; padding: 80px 40px;
+  }
+  .standing-overlay { position: absolute; inset: 0; background: rgba(5,10,20,0.88); }
+  .standing-inner { position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+  .standing-left .section-title { color: white; text-align: left; margin-bottom: 8px; }
+  .standing-left .section-subtitle { text-align: left; color: rgba(255,255,255,0.6); margin-left: 0; margin-bottom: 28px; }
+  .standing-table { width: 100%; border-collapse: collapse; }
+  .standing-table thead tr { background: var(--red); }
+  .standing-table thead th { color: white; font-family: var(--font-condensed); font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 10px 12px; text-align: center; }
+  .standing-table thead th:first-child { text-align: left; }
+  .standing-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .standing-table tbody tr:hover { background: rgba(255,255,255,0.05); }
+  .standing-table tbody td { color: rgba(255,255,255,0.85); font-size: 13px; padding: 11px 12px; text-align: center; }
+  .standing-table tbody td:first-child { text-align: left; }
+  .team-rank { color: var(--red); font-weight: 700; margin-right: 8px; }
+  .team-name-cell { font-weight: 700; font-size: 13px; }
+  .standing-right { display: flex; flex-direction: column; gap: 20px; }
+  .result-card {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    padding: 20px 24px; display: flex; align-items: center; gap: 18px;
+    transition: background 0.2s;
+  }
+  .result-card:hover { background: rgba(255,255,255,0.09); }
+  .result-badge { background: var(--red); color: white; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 10px; }
+  .result-score { font-family: var(--font-heading); font-size: 28px; font-weight: 700; color: white; }
+  .result-teams { color: rgba(255,255,255,0.6); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+  .result-date { color: rgba(255,255,255,0.4); font-size: 11px; margin-top: 2px; }
+
+  /* ===== PLAYERS ===== */
+  .players-section { background: white; padding: 80px 40px; }
+  .players-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; max-width: 1200px; margin-left: auto; margin-right: auto; }
+  .players-title { font-family: var(--font-heading); font-size: 34px; font-weight: 700; text-transform: uppercase; }
+  .players-nav { display: flex; gap: 8px; }
+  .players-nav-btn {
+    width: 36px; height: 36px; background: var(--dark); color: white;
+    border: none; cursor: pointer; font-size: 13px; transition: background 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .players-nav-btn:hover, .players-nav-btn.active { background: var(--red); }
+  .players-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 1200px; margin: 0 auto; }
+  .player-card { cursor: pointer; overflow: hidden; }
+  .player-img-wrap { position: relative; overflow: hidden; }
+  .player-img-placeholder {
+    width: 100%; padding-bottom: 110%;
+    background: linear-gradient(160deg, #1a1a2e 0%, #0d0d0d 100%);
+    position: relative; display: flex; align-items: center; justify-content: center;
+  }
+  .player-img-placeholder .player-icon {
+    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    font-size: 80px; color: rgba(255,255,255,0.15);
+  }
+  .player-overlay {
+    position: absolute; inset: 0; background: linear-gradient(to top, rgba(192,57,43,0.7) 0%, transparent 60%);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .player-card:hover .player-overlay { opacity: 1; }
+  .player-info { background: var(--dark); padding: 14px 16px; text-align: center; }
+  .player-name { color: white; font-family: var(--font-heading); font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .player-pos { color: rgba(255,255,255,0.4); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+  /* Player image backgrounds */
+  .player-bg-1 { background: linear-gradient(160deg, #1e3a5f 0%, #0a1628 100%); }
+  .player-bg-2 { background: linear-gradient(160deg, #2d0b0b 0%, #0d0d0d 100%); }
+  .player-bg-3 { background: linear-gradient(160deg, #0b2d2d 0%, #0d0d0d 100%); }
+  .player-bg-4 { background: linear-gradient(160deg, #1a1a1a 0%, #0d0d0d 100%); }
+
+  /* ===== UPCOMING BIG MATCH ===== */
+  .big-match-section {
+    background: url('https://themewant.com/products/html/kester/assets/images/background/baseball-court2.jpg?w=1600&q=80') center/cover no-repeat;
+    position: relative; padding: 100px 40px; text-align: center;
+  }
+  .big-match-overlay { position: absolute; inset: 0; background: rgba(5,5,15,0.5); }
+  .big-match-inner { position: relative; z-index: 2; max-width: 800px; margin: 0 auto; }
+  .bm-title { font-family: var(--font-heading); font-size: 34px; font-weight: 700; text-transform: uppercase; color: white; letter-spacing: 2px; margin-bottom: 8px; }
+  .bm-date { color: rgba(255,255,255,0.5); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 36px; }
+  .bm-matchup { display: flex; align-items: center; justify-content: center; gap: 40px; margin-bottom: 36px; flex-wrap: wrap; }
+  .bm-team { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .bm-logo {
+    width: 90px; height: 90px; border-radius: 50%;
+    background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;
+    font-size: 36px; border: 2px solid rgba(255,255,255,0.15);
+  }
+  .bm-team-name { color: white; font-family: var(--font-heading); font-size: 22px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .bm-vs { color: var(--red); font-family: var(--font-heading); font-size: 32px; font-weight: 700; }
+  .bm-btn {
+    background: var(--red); color: white; padding: 14px 40px;
+    font-family: var(--font-heading); font-size: 13px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; border: none; cursor: pointer;
+    transition: background 0.2s; display: inline-block; margin-bottom: 48px;
+  }
+  .bm-btn:hover { background: var(--red-dark); }
+  .countdown { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+  .countdown-item { text-align: center; }
+  .countdown-num { font-family: var(--font-heading); font-size: 56px; font-weight: 700; color: white; line-height: 1; display: block; }
+  .countdown-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 6px; display: block; }
+
+  /* ===== SHOP BY LOOK ===== */
+  .shop-section { background: white; padding: 80px 40px; }
+  .shop-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; max-width: 1200px; margin: 0 auto; }
+  .shop-card { cursor: pointer; text-align: center; }
+  .shop-img-wrap {
+    background: #f7f7f7; padding: 30px 20px; margin-bottom: 14px;
+    transition: background 0.2s; overflow: hidden;
+  }
+  .shop-card:hover .shop-img-wrap { background: #f0f0f0; }
+  .shop-icon { font-size: 70px; color: var(--dark); line-height: 1; margin: 0 auto; }
+  .shop-name { font-family: var(--font-heading); font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--dark); margin-bottom: 4px; }
+  .shop-price { font-size: 14px; color: var(--red); font-weight: 700; }
+
+  /* ===== SPONSORS ===== */
+  .sponsors-section { background: #f8f8f8; padding: 50px 40px; border-top: 1px solid #eee; }
+  .sponsors-grid { display: flex; align-items: center; justify-content: center; gap: 50px; flex-wrap: wrap; max-width: 1000px; margin: 0 auto; }
+  .sponsor-item { display: flex; align-items: center; gap: 8px; color: #aaa; font-family: var(--font-heading); font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; transition: color 0.2s; cursor: pointer; }
+  .sponsor-item:hover { color: var(--red); }
+  .sponsor-item i { font-size: 22px; }
+
+  /* ===== FOOTER ===== */
+  .footer { background: #0d0d0d; color: rgba(255,255,255,0.7); padding: 60px 40px 0; }
+  .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1.2fr 1.3fr; gap: 50px; max-width: 1200px; margin: 0 auto; padding-bottom: 50px; }
+  .footer-brand { }
+  .footer-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .footer-logo-icon { width: 46px; height: 46px; background: var(--red); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; font-weight: 700; }
+  .footer-logo-text .brand { font-family: var(--font-heading); font-size: 20px; color: white; font-weight: 700; letter-spacing: 1px; display: block; }
+  .footer-logo-text .sub { font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+  .footer-about { font-size: 13px; line-height: 1.8; color: rgba(255,255,255,0.5); margin-bottom: 20px; }
+  .footer-social { display: flex; gap: 10px; }
+  .social-btn { width: 34px; height: 34px; background: rgba(255,255,255,0.07); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: rgba(255,255,255,0.6); cursor: pointer; transition: all 0.2s; }
+  .social-btn:hover { background: var(--red); color: white; }
+  .footer-col h4 { font-family: var(--font-heading); font-size: 16px; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+  .footer-links li { margin-bottom: 10px; }
+  .footer-links a { font-size: 13px; color: rgba(255,255,255,0.5); transition: color 0.2s; display: flex; align-items: center; gap: 8px; }
+  .footer-links a:hover { color: var(--red); }
+  .footer-links a::before { content: '›'; color: var(--red); font-size: 16px; }
+  .footer-gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .gallery-thumb {
+    width: 100%; padding-bottom: 100%; position: relative; overflow: hidden; cursor: pointer;
+    background: linear-gradient(135deg, #1a0505, #2d0b0b);
+  }
+  .gallery-thumb::after {
+    content: '⚾'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; color: rgba(255,255,255,0.3);
+  }
+  .gallery-thumb:hover::after { color: rgba(255,255,255,0.6); }
+  .footer-contact li { display: flex; gap: 12px; font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 14px; align-items: flex-start; line-height: 1.5; }
+  .footer-contact i { color: var(--red); font-size: 14px; margin-top: 2px; flex-shrink: 0; width: 16px; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.07); padding: 20px 0; max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .footer-bottom-text { font-size: 12px; color: rgba(255,255,255,0.35); }
+  .footer-bottom-links { display: flex; gap: 20px; }
+  .footer-bottom-links a { font-size: 12px; color: rgba(255,255,255,0.35); transition: color 0.2s; }
+  .footer-bottom-links a:hover { color: var(--red); }
+
+  /* ===== MOBILE NAV MENU ===== */
+  .mobile-menu {
+    display: none; position: fixed; top: 64px; left: 0; right: 0; z-index: 999;
+    background: rgba(10,10,10,0.98); padding: 20px 30px;
+    flex-direction: column; gap: 16px; border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a { color: rgba(255,255,255,0.85); font-size: 14px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 1100px) {
+    .news-grid { grid-template-columns: 1fr; }
+    .standing-inner { grid-template-columns: 1fr; gap: 40px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
+  }
+  @media (max-width: 900px) {
+    .players-grid { grid-template-columns: repeat(2, 1fr); }
+    .shop-grid { grid-template-columns: repeat(2, 1fr); }
+    .navbar { padding: 0 20px; }
+    .nav-menu { display: none; }
+    .hamburger { display: flex; }
+    .hero-content { padding: 0 30px; }
+    .hero-scroll-line { left: 30px; }
+    .footer-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 680px) {
+    .news-main { grid-template-columns: 1fr; }
+    .players-grid { grid-template-columns: repeat(2, 1fr); }
+    .shop-grid { grid-template-columns: repeat(2, 1fr); }
+    .countdown { gap: 16px; }
+    .countdown-num { font-size: 40px; }
+    .bm-matchup { gap: 20px; }
+    .games-track { flex-direction: column; align-items: center; }
+    .game-card { max-width: 100%; width: 100%; }
+    .upcoming-games, .news-section, .players-section, .shop-section { padding: 60px 20px; }
+    .standing-section, .big-match-section { padding: 60px 20px; }
+    .footer { padding: 50px 20px 0; }
+    .sponsors-section { padding: 40px 20px; }
+    .sponsors-grid { gap: 28px; }
+  }
+  @media (max-width: 480px) {
+    .players-grid { grid-template-columns: 1fr 1fr; }
+    .shop-grid { grid-template-columns: 1fr 1fr; }
+    .hero-title { font-size: 40px; }
+    .bm-logo { width: 68px; height: 68px; font-size: 28px; }
+    .bm-team-name { font-size: 18px; }
+    .section-title { font-size: 26px; }
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-content > * { animation: fadeUp 0.7s ease forwards; opacity: 0; }
+  .hero-badge { animation-delay: 0.1s; }
+  .hero-title { animation-delay: 0.25s; }
+  .hero-subtitle { animation-delay: 0.4s; }
+  .hero-buttons { animation-delay: 0.55s; }
+  .hero-scroll-line { animation-delay: 0.7s; }
+
+  /* Player card images */
+  .player-img-wrap { height: 280px; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; }
+  .player-img-inner {
+    width: 100%; height: 100%;
+    display: flex; align-items: flex-end; justify-content: center;
+    position: relative;
+  }
+  .player-silhouette { font-size: 130px; color: rgba(255,255,255,0.15); line-height: 1; position: relative; z-index: 1; }
+  .player-number {
+    position: absolute; top: 16px; right: 16px; font-family: var(--font-heading);
+    font-size: 48px; font-weight: 700; color: rgba(255,255,255,0.08); line-height: 1;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">⚾</div>
+    <div class="nav-logo-text">
+      <span class="brand">BRAND</span>
+      <span class="sub">Baseball Club</span>
+    </div>
+  </div>
+  <div class="nav-menu">
+    <a href="#" class="active">Home</a>
+    <a href="#about">About</a>
+    <a href="#pages">Pages</a>
+    <a href="#shop">Shop</a>
+    <a href="#news">News</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-search"><i class="fas fa-search"></i></span>
+    <span class="nav-icon"><i class="fas fa-user"></i></span>
+    <button class="nav-ticket-btn">Get Tickets</button>
+  </div>
+  <div class="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#">Home</a>
+  <a href="#about">About</a>
+  <a href="#pages">Pages</a>
+  <a href="#shop">Shop</a>
+  <a href="#news">News</a>
+  <a href="#contact">Contact</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <span class="hero-badge">Baseball Game</span>
+    <h1 class="hero-title">Exploring World<br>of Baseball</h1>
+    <p class="hero-subtitle">It's a crucial game to strive team. Join us for an unforgettable championship league experience on the field of play.</p>
+    <div class="hero-buttons">
+      <a href="#about" class="btn-primary"><i class="fas fa-users"></i> Our Team</a>
+      <a href="#upcoming" class="btn-outline"><i class="fas fa-calendar-alt"></i> Next Match</a>
+    </div>
+  </div>
+  <div class="hero-scroll-line">Scroll Down</div>
+</section>
+
+<!-- UPCOMING GAMES -->
+<div style="padding:80px 20px; font-family:Arial,sans-serif; background:#fff;">
+    <div style="max-width:1320px; margin:0 auto;">
+
+        <!-- Title -->
+        <div style="text-align:center; margin-bottom:50px;">
+            <h1 style="font-size:40px; font-weight:700; margin-bottom:15px;">UPCOMING GAMES</h1>
+            <p style="color:#666; font-size:15px; line-height:1.6;">
+                match part of a tournament, league, or any special event. <br>
+                Is it a crucial game for either team
+            </p>
+        </div>
+
+        <!-- Scrollable Slider -->
+        <div style="display:flex; gap:30px; overflow-x:auto; padding-bottom:10px;">
+
+            <!-- Card 1 -->
+            <div style="min-width:400px;height:140px; background:#f8f8f8; border-radius:12px; padding:25px; display:flex; align-items:center; justify-content:space-between;">
+                <img src="https://themewant.com/products/html/kester/assets/images/icons/club-17.svg" style="width:60px;">
+                <div style="text-align:center;">
+                    <p style="font-size:13px; color:#777;">August 11, 2023</p>
+                    <p style="font-size:13px; color:#777;">5:45 PM</p>
+                    <h3 style="font-size:18px; margin-top:8px;">
+                        Dragons <span style="color:#e63946;">VS</span> Manhut
+                    </h3>
+                </div>
+                <img src="https://themewant.com/products/html/kester/assets/images/icons/club-14.svg" style="width:60px;">
+            </div>
+
+            <!-- Card 2 -->
+            <div style="min-width:400px;height:140px;background-color: #474758; border-radius:12px; padding:25px; display:flex; align-items:center; justify-content:space-between;">
+                <img src="https://themewant.com/products/html/kester/assets/images/icons/club-17.svg" style="width:60px;">
+                <div style="text-align:center;">
+                    <p style="font-size:13px; color:#777;">August 11, 2023</p>
+                    <p style="font-size:13px; color:#777;">5:45 PM</p>
+                    <h3 style="font-size:18px; margin-top:8px;">
+                        Dragons <span style="color:#e63946;">VS</span> Manhut
+                    </h3>
+                </div>
+                <img src="https://themewant.com/products/html/kester/assets/images/icons/club-13.svg" style="width:60px;">
+            </div>
+
+            <!-- Card 3 -->
+            <div style="min-width:320px; background:#f8f8f8; border-radius:12px; padding:25px; display:flex; align-items:center; justify-content:space-between;">
+                <img src="https://themewant.com/products/html/kester/assets/images/icons/club-17.svg" style="width:60px;">
+                <div style="text-align:center;">
+                    <p style="font-size:13px; color:#777;">August 11, 2023</p>
+                    <p style="font-size:13px; color:#777;">5:45 PM</p>
+                    <h3 style="font-size:18px; margin-top:8px;">
+                        Dragons <span style="color:#e63946;">VS</span> Manhut
+                    </h3>
+                </div>
+                <img src="https://themewant.com/products/html/kester/assets/images/icons/club-18.svg" style="width:60px;">
+            </div>
+
+        </div>
+
+    </div>
+</div>
+<!-- <section class="upcoming-games" id="upcoming">
+  <h2 class="section-title">Upcoming Games</h2>
+  <p class="section-subtitle">We're part of a spectacular league of the special club. It's a crucial game to strive team.</p>
+  <div class="games-slider" style="max-width:1000px;margin:0 auto;position:relative;">
+    <div class="slider-arrows">
+      <button class="arrow-btn" onclick="prevGame()"><i class="fas fa-chevron-left"></i></button>
+      <button class="arrow-btn" onclick="nextGame()"><i class="fas fa-chevron-right"></i></button>
+    </div>
+    <div class="games-track" id="gamesTrack">
+      <div class="game-card">
+        <div class="game-date">August 11, 2023</div>
+        <div class="game-time">5:45 PM</div>
+        <div class="game-teams">
+          <div class="team-logo-box">⚾</div>
+          <div class="vs-text">VS</div>
+          <div class="team-logo-box">🏟</div>
+        </div>
+        <div class="game-vs-label">DRAGONS vs MARKET</div>
+      </div>
+      <div class="game-card featured">
+        <div class="game-date">August 13, 2023</div>
+        <div class="game-time">5:45 PM</div>
+        <div class="game-teams">
+          <div class="team-logo-box">⚾</div>
+          <div class="vs-text">VS</div>
+          <div class="team-logo-box">🏆</div>
+        </div>
+        <div class="game-vs-label">DRAGONS vs MARKET</div>
+      </div>
+      <div class="game-card">
+        <div class="game-date">August 11, 2023</div>
+        <div class="game-time">5:45 PM</div>
+        <div class="game-teams">
+          <div class="team-logo-box">⚾</div>
+          <div class="vs-text">VS</div>
+          <div class="team-logo-box">🥊</div>
+        </div>
+        <div class="game-vs-label">DRAGONS vs MARKET</div>
+      </div>
+    </div>
+    <div class="slider-dots">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+</section> -->
+
+<!-- NEWS & MEDIA -->
+<div style="padding:80px 20px; font-family:Arial,sans-serif; background:#fff;">
+    <div style="max-width:1320px; margin:0 auto;">
+
+        <!-- Title -->
+        <div style="text-align:center; margin-bottom:50px;">
+            <h1 style="font-size:42px; font-weight:700; margin-bottom:20px;">NEWS & MEDIA</h1>
+            <p style="font-size:16px; color:#666; line-height:1.7;">
+                In a stunning turn of events, the baseball world is buzzing with excitement <br>
+                as a whirlwind of developments unfolds both on and off the field.
+            </p>
+        </div>
+
+        <!-- Main Row -->
+        <div style="display:flex; flex-wrap:wrap; gap:25px;">
+
+            <!-- Left Side -->
+            <div style="flex:0 0 64%; display:flex; gap:25px;">
+
+                <!-- Item 1 -->
+                <div style="position:relative; width:50%; overflow:hidden; border-radius:10px;">
+                    <a href="blog-details.html">
+                        <img src="https://themewant.com/products/html/kester/assets/images/blog/news21.jpg" style="width:100%; display:block;">
+                    </a>
+                    <div style="position:absolute; bottom:0; left:0; width:100%; padding:25px; background:linear-gradient(to top, rgba(0,0,0,0.8), transparent); color:#fff;">
+                        <p style="font-size:12px; font-weight:600; margin-bottom:10px;">HIGHLIGHTS</p>
+                        <a href="blog-details.html" style="color:#fff; font-size:22px; font-weight:700; text-decoration:none; line-height:1.4;">
+                            You're going to want to hop on the Yandi bandwagon
+                        </a><br><br>
+                        <a href="blog-details.html" style="color:#fff; font-size:13px; text-decoration:none;">READ MORE</a>
+                    </div>
+                </div>
+
+                <!-- Item 2 -->
+                <div style="position:relative; width:50%; overflow:hidden; border-radius:10px;">
+                    <a href="blog-details.html">
+                        <img src="https://themewant.com/products/html/kester/assets/images/blog/news22.jpg" style="width:100%; display:block;">
+                    </a>
+                    <div style="position:absolute; bottom:0; left:0; width:100%; padding:25px; background:linear-gradient(to top, rgba(0,0,0,0.8), transparent); color:#fff;">
+                        <p style="font-size:12px; font-weight:600; margin-bottom:10px;">HIGHLIGHTS</p>
+                        <a href="blog-details.html" style="color:#fff; font-size:22px; font-weight:700; text-decoration:none; line-height:1.4;">
+                            You're going to want to hop on the Yandi bandwagon
+                        </a><br><br>
+                        <a href="blog-details.html" style="color:#fff; font-size:13px; text-decoration:none;">READ MORE</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Side -->
+            <div style="flex:0 0 33%; display:flex; flex-direction:column; gap:20px;">
+
+                <!-- Small Post 1 -->
+                <div style="display:flex; gap:15px; align-items:flex-start;">
+                    <img src="https://themewant.com/products/html/kester/assets/images/blog/small-post4.png" style="width:120px; border-radius:8px;">
+                    <div>
+                        <p style="font-size:13px; color:#888;">August 16, 2023</p>
+                        <a href="blog-details.html" style="font-size:18px; font-weight:600; color:#111; text-decoration:none; line-height:1.5;">
+                            A batter who's catches a pitch while batting
+                        </a><br><br>
+                        <a href="blog-details.html" style="font-size:13px; color:#111; text-decoration:none;">READ MORE</a>
+                    </div>
+                </div>
+
+                <!-- Small Post 2 -->
+                <div style="display:flex; gap:15px; align-items:flex-start;">
+                    <img src="https://themewant.com/products/html/kester/assets/images/blog/small-post5.png" style="width:120px; border-radius:8px;">
+                    <div>
+                        <p style="font-size:13px; color:#888;">August 16, 2023</p>
+                        <a href="blog-details.html" style="font-size:18px; font-weight:600; color:#111; text-decoration:none; line-height:1.5;">
+                            the Upcoming Baseball Battle Match
+                        </a><br><br>
+                        <a href="blog-details.html" style="font-size:13px; color:#111; text-decoration:none;">READ MORE</a>
+                    </div>
+                </div>
+
+                <!-- Small Post 3 -->
+                <div style="display:flex; gap:15px; align-items:flex-start;">
+                    <img src="https://themewant.com/products/html/kester/assets/images/blog/small-post6.png" style="width:120px; border-radius:8px;">
+                    <div>
+                        <p style="font-size:13px; color:#888;">August 16, 2023</p>
+                        <a href="blog-details.html" style="font-size:18px; font-weight:600; color:#111; text-decoration:none; line-height:1.5;">
+                            'Five more pushups' and maybe he'd have had
+                        </a><br><br>
+                        <a href="blog-details.html" style="font-size:13px; color:#111; text-decoration:none;">READ MORE</a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- <section class="news-section" id="news">
+  <h2 class="section-title">News &amp; Media</h2>
+  <p class="section-subtitle">In a stunning turn of events, the baseball world is buzzing with excitement. Is it a monumental development within an enterprise for all the field.</p>
+  <div class="news-grid">
+    <div class="news-main">
+      <div class="news-card">
+        <div class="news-img-placeholder" style="background:linear-gradient(135deg,#0d1b2a,#1b263b)"><i class="fas fa-baseball-ball" style="font-size:48px;color:rgba(255,255,255,0.2)"></i></div>
+        <div class="news-body">
+          <span class="news-tag">Baseball Game</span>
+          <div class="news-title-text">You're Going To Want To Hop On The Yandi Bandwagon</div>
+          <div class="news-read"><i class="fas fa-arrow-right"></i> Read More</div>
+        </div>
+      </div>
+      <div class="news-card">
+        <div class="news-img-placeholder" style="background:linear-gradient(135deg,#1b0000,#3b0f0f)"><i class="fas fa-trophy" style="font-size:48px;color:rgba(255,255,255,0.2)"></i></div>
+        <div class="news-body">
+          <span class="news-tag">Baseball Game</span>
+          <div class="news-title-text">You're Going To Want To Hop On The Yandi Bandwagon</div>
+          <div class="news-read"><i class="fas fa-arrow-right"></i> Read More</div>
+        </div>
+      </div>
+    </div>
+    <div class="news-sidebar">
+      <div class="news-side-item">
+        <div class="news-side-img" style="background:linear-gradient(135deg,#c0392b,#922b21);display:flex;align-items:center;justify-content:center;"><i class="fas fa-baseball-ball" style="color:rgba(255,255,255,0.5);font-size:22px;"></i></div>
+        <div class="news-side-body">
+          <div class="news-side-date">August 15, 2023</div>
+          <div class="news-side-title">A Batter Who Catches A Pitch While Batting</div>
+          <div class="news-side-read"><i class="fas fa-arrow-right"></i> Read More</div>
+        </div>
+      </div>
+      <div class="news-side-item">
+        <div class="news-side-img" style="background:linear-gradient(135deg,#1a4a6b,#0d2b40);display:flex;align-items:center;justify-content:center;"><i class="fas fa-fist-raised" style="color:rgba(255,255,255,0.5);font-size:22px;"></i></div>
+        <div class="news-side-body">
+          <div class="news-side-date">August 13, 2023</div>
+          <div class="news-side-title">The Upcoming Baseball Battle Match</div>
+          <div class="news-side-read"><i class="fas fa-arrow-right"></i> Read More</div>
+        </div>
+      </div>
+      <div class="news-side-item">
+        <div class="news-side-img" style="background:linear-gradient(135deg,#1a3a1a,#0d280d);display:flex;align-items:center;justify-content:center;"><i class="fas fa-medal" style="color:rgba(255,255,255,0.5);font-size:22px;"></i></div>
+        <div class="news-side-body">
+          <div class="news-side-date">August 11, 2023</div>
+          <div class="news-side-title">'Five More Pickups' And Maybe He's Have Had</div>
+          <div class="news-side-read"><i class="fas fa-arrow-right"></i> Read More</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+<!-- PRIMARY LEAGUE STANDING -->
+<section class="standing-section" id="about">
+  <div class="standing-overlay"></div>
+  <div class="standing-inner">
+    <div class="standing-left">
+      <h2 class="section-title" style="color:white;text-align:left;">Primary League Standing</h2>
+      <p class="section-subtitle" style="text-align:left;color:rgba(255,255,255,0.55);margin-left:0;">As a stunning turn of events, the baseball world is buzzing with excitement. A monumental development within an enterprise on all of the field.</p>
+      <table class="standing-table">
+        <thead>
+          <tr>
+            <th>POS  Team</th>
+            <th>W</th><th>L</th><th>PCT</th>
+            <th>GB</th><th>RS</th><th>RA</th><th>HOME</th><th>AWAY</th><th>STRK</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="team-rank">1</span><span class="team-name-cell">⚾ DRAGONS</span></td>
+            <td>8</td><td>0</td><td>1.000</td>
+            <td>—</td><td>60</td><td>30</td><td>4-0</td><td>4-0</td><td>W8</td>
+          </tr>
+          <tr>
+            <td><span class="team-rank">2</span><span class="team-name-cell">🏆 WESTON</span></td>
+            <td>6</td><td>2</td><td>0.895</td>
+            <td>2</td><td>48</td><td>28</td><td>3-1</td><td>3-1</td><td>W3</td>
+          </tr>
+          <tr>
+            <td><span class="team-rank">3</span><span class="team-name-cell">🥊 BULLS</span></td>
+            <td>5</td><td>3</td><td>0.810</td>
+            <td>3</td><td>42</td><td>32</td><td>2-2</td><td>3-1</td><td>L1</td>
+          </tr>
+          <tr>
+            <td><span class="team-rank">4</span><span class="team-name-cell">⚡ MARKET</span></td>
+            <td>4</td><td>4</td><td>0.715</td>
+            <td>4</td><td>40</td><td>38</td><td>2-2</td><td>2-2</td><td>W2</td>
+          </tr>
+          <tr>
+            <td><span class="team-rank">5</span><span class="team-name-cell">🌟 MILANO</span></td>
+            <td>3</td><td>5</td><td>0.640</td>
+            <td>5</td><td>32</td><td>40</td><td>1-3</td><td>2-2</td><td>L2</td>
+          </tr>
+          <tr>
+            <td><span class="team-rank">6</span><span class="team-name-cell">🔥 ASTRO</span></td>
+            <td>1</td><td>7</td><td>0.462</td>
+            <td>7</td><td>25</td><td>5-0</td><td>1-3</td><td>0-4</td><td>L4</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="standing-right">
+      <div style="background:var(--red);display:inline-block;padding:6px 18px;font-family:var(--font-heading);font-size:12px;font-weight:700;color:white;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">RESULTS</div>
+      <div class="result-card">
+        <div>
+          <div class="result-badge">FINAL</div>
+          <div class="result-score">8 — 2</div>
+          <div class="result-teams">DRAGONS vs MARKET</div>
+          <div class="result-date">August 13, 2023</div>
+        </div>
+        <div style="font-size:36px;color:rgba(255,255,255,0.1);">⚾</div>
+      </div>
+      <div class="result-card">
+        <div>
+          <div class="result-badge">FINAL</div>
+          <div class="result-score">5 — 3</div>
+          <div class="result-teams">DRAGONS vs MARKET</div>
+          <div class="result-date">August 11, 2023</div>
+        </div>
+        <div style="font-size:36px;color:rgba(255,255,255,0.1);">⚾</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLAYERS -->
+
+ <section class="players-section" id="pages">
+  <div class="players-header">
+    <h2 class="players-title">Players</h2>
+    <div class="players-nav">
+      <button class="players-nav-btn active"><i class="fas fa-chevron-left"></i></button>
+      <button class="players-nav-btn"><i class="fas fa-chevron-right"></i></button>
+    </div>
+  </div>
+  <div class="players-grid">
+    <div class="player-card">
+      <div class="player-card">
+                                    <a class="image" href="team-details.html"><img src="https://themewant.com/products/html/kester/assets/images/team/team15.png" alt=""></a>
+                                    
+                                </div>
+      <div class="player-info">
+        <div class="player-name">Robert Morry</div>
+        <div class="player-pos">Pitcher</div>
+      </div>
+    </div>
+   
+    
+  <div class="player-card">
+      <div class="player-card">
+                                    <a class="image" href="team-details.html"><img src="https://themewant.com/products/html/kester/assets/images/team/team14.png" alt=""></a>
+                                    
+                                </div>
+      <div class="player-info">
+        <div class="player-name">John Haklcar</div>
+        <div class="player-pos">Catcher</div>
+      </div>
+    </div>
+
+    
+    <div class="player-card">
+      <div class="player-card">
+                                    <a class="image" href="team-details.html"><img src="https://themewant.com/products/html/kester/assets/images/team/team16.png" alt=""></a>
+                                    
+                                </div>
+      <div class="player-info">
+        <div class="player-name">Sam Jones</div>
+        <div class="player-pos">Outfielder</div>
+      </div>
+    </div>
+
+    <div class="player-card">
+      <div class="player-card">
+                                    <a class="image" href="team-details.html"><img src="https://themewant.com/products/html/kester/assets/images/team/team17.png" alt=""></a>
+                                    
+                                </div>
+      <div class="player-info">
+        <div class="player-name">David William</div>
+        <div class="player-pos">First Baseman</div>
+      </div>
+    </div>
+    
+  </div>
+</section> 
+
+<!-- UPCOMING BIG MATCH -->
+<section class="big-match-section">
+  <div class="big-match-overlay"></div>
+  <div class="big-match-inner">
+    <h2 class="bm-title">Upcoming Big Match</h2>
+    <p class="bm-date">August 20, 2023 · 5:45 PM</p>
+    <div class="bm-matchup">
+      <div class="bm-team">
+        <div><img src="https://themewant.com/products/html/kester/assets/images/clubs/19.png"></div>
+        <!-- <div class="bm-logo">⚾</div> -->
+        <div class="bm-team-name">DRAGONS</div>
+      </div>
+      <div class="bm-vs">VS</div>
+      <div class="bm-team">
+        <div class="bm-team">
+        <div><img src="https://themewant.com/products/html/kester/assets/images/clubs/20.png"></div>
+        <!-- <div class="bm-logo">🏆</div> -->
+        <div class="bm-team-name">BULLS</div>
+      </div>
+    </div>
+    <a href="#" class="bm-btn">Get Ticket</a>
+    <div class="countdown" id="countdown">
+      <div class="countdown-item"><span class="countdown-num" id="cd-days">67</span><span class="countdown-label">Days</span></div>
+      <div class="countdown-item"><span class="countdown-num" id="cd-hours">13</span><span class="countdown-label">Hours</span></div>
+      <div class="countdown-item"><span class="countdown-num" id="cd-mins">08</span><span class="countdown-label">Minute</span></div>
+      <div class="countdown-item"><span class="countdown-num" id="cd-secs">44</span><span class="countdown-label">Second</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- SHOP BY LOOK -->
+<div style="padding:60px 0; font-family:Arial, sans-serif;">
+    <div style="max-width:1200px; margin:0 auto; padding:0 15px;">
+        
+        <div style="margin-bottom:20px;">
+            <h2 style="font-size:28px; font-weight:700; margin:0;">SHOP BY LOOK</h2>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:20px;">
+            
+            <!-- Product 1 -->
+            <div style="width:23%; min-width:250px; border:1px solid #eee; padding:15px; position:relative;">
+                <a href="product-details.html">
+                    <img src="https://themewant.com/products/html/kester/assets/images/products/product13.png" style="width:100%;" alt="">
+                </a>
+                <div style="padding-top:10px;">
+                    <a href="#" style="text-decoration:none; color:#000; font-weight:600;">KEEPER GLOVES</a>
+                    <div style="margin-top:10px;">
+                        <span style="font-weight:bold;">$38.00 
+                            <span style="text-decoration:line-through; color:#999;">$56.00</span>
+                        </span>
+                        <br>
+                        <a href="cart.html" style="display:inline-block; margin-top:8px; padding:6px 12px; background:#000; color:#fff; text-decoration:none; font-size:12px;">
+                            ADD TO CART
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div style="width:23%; min-width:250px; border:1px solid #eee; padding:15px;">
+                <a href="product-details.html">
+                    <img src="https://themewant.com/products/html/kester/assets/images/products/product14.png" style="width:100%;" alt="">
+                </a>
+                <div style="padding-top:10px;">
+                    <a href="#" style="text-decoration:none; color:#000; font-weight:600;">BASEBALL</a>
+                    <div style="margin-top:10px;">
+                        <span style="font-weight:bold;">$42.00 
+                            <span style="text-decoration:line-through; color:#999;">$60.00</span>
+                        </span>
+                        <br>
+                        <a href="cart.html" style="display:inline-block; margin-top:8px; padding:6px 12px; background:#000; color:#fff; text-decoration:none; font-size:12px;">
+                            ADD TO CART
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div style="width:23%; min-width:250px; border:1px solid #eee; padding:15px;">
+                <a href="product-details.html">
+                    <img src="https://themewant.com/products/html/kester/assets/images/products/product15.png" style="width:100%;" alt="">
+                </a>
+                <div style="padding-top:10px;">
+                    <a href="#" style="text-decoration:none; color:#000; font-weight:600;">GAMING BAT</a>
+                    <div style="margin-top:10px;">
+                        <span style="font-weight:bold;">$58.00 
+                            <span style="text-decoration:line-through; color:#999;">$90.00</span>
+                        </span>
+                        <br>
+                        <a href="cart.html" style="display:inline-block; margin-top:8px; padding:6px 12px; background:#000; color:#fff; text-decoration:none; font-size:12px;">
+                            ADD TO CART
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 4 -->
+            <div style="width:23%; min-width:250px; border:1px solid #eee; padding:15px;">
+                <a href="product-details.html">
+                    <img src="https://themewant.com/products/html/kester/assets/images/products/product16.png" style="width:100%;" alt="">
+                </a>
+                <div style="padding-top:10px;">
+                    <a href="#" style="text-decoration:none; color:#000; font-weight:600;">BATTER HELMET</a>
+                    <div style="margin-top:10px;">
+                        <span style="font-weight:bold;">$20.00 
+                            <span style="text-decoration:line-through; color:#999;">$36.00</span>
+                        </span>
+                        <br>
+                        <a href="cart.html" style="display:inline-block; margin-top:8px; padding:6px 12px; background:#000; color:#fff; text-decoration:none; font-size:12px;">
+                            ADD TO CART
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- SPONSORS -->
+<section class="sponsors-section">
+  <div class="sponsors-grid">
+    <div class="sponsor-item"><i class="fas fa-baseball-ball"></i> BASEBALL</div>
+    <div class="sponsor-item"><i class="fas fa-trophy"></i> CHAMPIONS</div>
+    <div class="sponsor-item"><i class="fas fa-star"></i> BASEBALL</div>
+    <div class="sponsor-item"><i class="fas fa-shield-alt"></i> LEAGUE</div>
+    <div class="sponsor-item"><i class="fas fa-medal"></i> BASEBALL</div>
+    <div class="sponsor-item"><i class="fas fa-futbol"></i> BASEBALL</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer" id="contact">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <div class="footer-logo-icon">⚾</div>
+        <div class="footer-logo-text">
+          <span class="brand">BRAND</span>
+          <span class="sub">Baseball Club</span>
+        </div>
+      </div>
+      <p class="footer-about">We're at the top of a tournament ladder since the 1980s which is named after the Our BRAND with a wonderful theme. It shows with all its players.</p>
+      <div class="footer-social">
+        <div class="social-btn"><i class="fab fa-facebook-f"></i></div>
+        <div class="social-btn"><i class="fab fa-twitter"></i></div>
+        <div class="social-btn"><i class="fab fa-instagram"></i></div>
+        <div class="social-btn"><i class="fab fa-youtube"></i></div>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Our Team</a></li>
+        <li><a href="#">News</a></li>
+        <li><a href="#">Players</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Post Gallery</h4>
+      <div class="footer-gallery">
+        <div> <img src="https://themewant.com/products/html/kester/assets/images/blog/small-post4.png" alt="side-post-image"></div>
+        <div> <img style="width:123px;height:123px;" src="https://themewant.com/products/html/kester/assets/images/blog/news22.jpg" alt="side-post-image"></div>
+        <div> <img style="width:123px;height:123px;" src="https://themewant.com/products/html/kester/assets/images/team/team17.png" alt="side-post-image"></div>
+        <div> <img src="https://themewant.com/products/html/kester/assets/images/blog/small-post4.png" alt="side-post-image"></div>
+        <!-- <div class="gallery-thumb" style="background:linear-gradient(135deg,#0a1628,#1e3a5f)"></div>
+        <div class="gallery-thumb" style="background:linear-gradient(135deg,#1a0a28,#3a1e5f)"></div> -->
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Key In Touch</h4>
+      <ul class="footer-contact">
+        <li><i class="fas fa-globe"></i><span>OurBRAND.COM</span></li>
+        <li><i class="fas fa-phone"></i><span>703 750 00</span></li>
+        <li><i class="fas fa-map-marker-alt"></i><span>254, California 20, Usat California, 20</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div style="color: white;"class="footer-bottom-text"> &copy; 2026 Our BRAND. All rights reserved developed by Zannatul.</div>
+    <div class="footer-bottom-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Mobile menu toggle
+  function toggleMenu() {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('open');
+  }
+
+  // Countdown timer
+  function updateCountdown() {
+    const target = new Date('2023-08-20T17:45:00');
+    const now = new Date();
+    const diff = Math.max(0, target - now);
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const secs = Math.floor((diff % (1000 * 60)) / 1000);
+    const pad = n => String(n).padStart(2, '0');
+    document.getElementById('cd-days').textContent = pad(days);
+    document.getElementById('cd-hours').textContent = pad(hours);
+    document.getElementById('cd-mins').textContent = pad(mins);
+    document.getElementById('cd-secs').textContent = pad(secs);
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // Dots active
+  document.querySelectorAll('.dot').forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
+    });
+  });
+
+  function prevGame() {}
+  function nextGame() {
+    const dots = document.querySelectorAll('.dot');
+    let active = Array.from(dots).findIndex(d => d.classList.contains('active'));
+    dots[active].classList.remove('active');
+    dots[(active + 1) % dots.length].classList.add('active');
+  }
+
+  // Scroll navbar
+  window.addEventListener('scroll', () => {
+    const navbar = document.querySelector('.navbar');
+    if (window.scrollY > 60) {
+      navbar.style.background = 'rgba(5,5,5,0.99)';
+    } else {
+      navbar.style.background = 'rgba(10,10,10,0.97)';
+    }
+  });
+
+  // Player nav button active
+  document.querySelectorAll('.players-nav-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.players-nav-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Close mobile menu when clicking a link
+  document.querySelectorAll('.mobile-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.remove('open');
+    });
+  });
+</script>
+</body>
+</html>
